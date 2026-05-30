@@ -1,10 +1,7 @@
 name: Publish
 
 on:
-  release:
-    types: [published]
-  # push:
-  #   branches: ['release']
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -19,25 +16,23 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@1f401f745bf57e30b3a2800ad308a87d2ebdf14b
+      - name: Log in to Docker Hub registry
+        uses: docker/login-action@v4
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ vars.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PAT }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      # - name: Extract metadata (tags, labels) for Docker
+      #   id: meta
+      #   uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934
+      #   with:
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@fdf7f43ecf7c1a5c7afe936410233728a8c2d9c2
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: hmartinez82/docker-rclone-sync:latest
